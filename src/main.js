@@ -7,6 +7,7 @@ import { CanvasExporter } from "./CanvasExporter.js";
 const app = {
   viewMode: false,
   inputActive: true,
+  inputTimeout: null,
   transparencyMode: false,
   smallScreen: false,
   touchDevice: false,
@@ -19,6 +20,12 @@ function setup() {
   app.canvasExporter = new CanvasExporter(app.canvas);
   app.tool = new SplatKomputer(app.canvas);
 
+  setupInputs();
+  document.onkeydown = processKeyInput;
+  document.onmousemove = inputTimeout;
+
+  window.onresize = resize;
+
   app.transparencyLayer = new TransparencyLayer();
   app.transparencyLayer.addObject(app, "Application");
   app.transparencyLayer.addObject(app.transparencyLayer, "Transparency Layer");
@@ -27,13 +34,9 @@ function setup() {
 
   setTransparencyMode(true);
 
-  setupInputs();
-  document.onkeydown = processKeyInput;
-
-  window.onresize = resize;
   resize();
-
   update();
+  inputTimeout();
 }
 
 function update() {
@@ -47,6 +50,7 @@ setup();
 // ---------
 
 function processKeyInput(e) {
+  inputTimeout();
   if (app.inputActive) {
     document.activeElement.blur();
     switch (e.code) {
@@ -73,6 +77,15 @@ function processKeyInput(e) {
         break;
     }
   }
+}
+
+function inputTimeout() {
+  app.tool.setIdleMode(false);
+  clearTimeout(app.inputTimeout);
+  app.inputTimeout = setTimeout(function () {
+    console.log("input timeout, enter idle");
+    app.tool.setIdleMode(true);
+  }, 30000);
 }
 
 function setupInputs() {

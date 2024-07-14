@@ -49,7 +49,6 @@ export class SplatKomputer {
       })
       .then(() => {
         this.splatViewer.start();
-        this.setupTransparencyView();
         this.updateView();
       });
 
@@ -86,6 +85,10 @@ export class SplatKomputer {
     console.log("set transparency mode");
     this.transparencyMode = value;
     this.setTransparencyView(value);
+  }
+
+  setIdleMode(value) {
+    this.splatViewer.perspectiveControls.autoRotate = value;
   }
 
   // --- CUSTOM METHODS
