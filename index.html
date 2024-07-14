@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon-prototype.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Splat Komputer</title>
+  </head>
+  <body>
+    <div id="sketch-guide">
+      <img id="small-screen-note" src="/bigger-screen-note.webp" alt="" />
+    </div>
+    <div id="info-layer">
+      <div class="info">loading</div>
+    </div>
+    <div id="transparency-layer">
+      <div class="side-panels">
+        <div id="info-panel">
+          <div class="title">
+            <h1>Toolbox Demo</h1>
+            <img src="/title.webp" alt="" />
+          </div>
+          <div id="credits">
+            <p>
+              a <a href="https://komputer.space">komputer.space</a> tool built
+              with
+              <a href="https://threejs.org/" target="_blank">three.js</a> and a
+              <a
+                href="https://github.com/mkkellogg/GaussianSplats3D"
+                target="_blank"
+                ><em>Gaussian Splat</em> viewer by mkkellog</a
+              >. Example splats made with
+              <a href="https://poly.cam/" target="_blank">Polycam</a> and
+              <a href="https://www.jawset.com/" target="_blank">Postshot</a>.
+            </p>
+            <p>
+              <a id="source-link" href="https://github.com/komputer-space/">
+                → source code</a
+              >
+            </p>
+          </div>
+        </div>
+        <div id="debug-layer"></div>
+      </div>
+      <div id="focus-info">
+        <p>press <em>space</em> to focus</p>
+      </div>
+    </div>
+    <div id="view-mode-indicator">
+      <div>
+        <img src="/view-frame/frame-01.webp" alt="" />
+        <img src="/view-frame/frame-02.webp" alt="" />
+      </div>
+      <div>
+        <img src="/view-frame/frame-03.webp" alt="" />
+        <img src="/view-frame/frame-04.webp" alt="" />
+      </div>
+    </div>
+    <div id="app">
+      <div id="dropzone">
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

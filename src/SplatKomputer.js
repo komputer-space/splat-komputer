@@ -1,0 +1,163 @@
+import * as THREE from "three";
+import * as GaussianSplats3D from "@mkkellogg/gaussian-splats-3d";
+
+import { InfoLayer } from "./InfoLayer";
+import { FileImporter } from "./FileImporter";
+
+export class SplatKomputer {
+  constructor(canvas) {
+    this.transparencyMode = false;
+    this.freeze = false;
+
+    this.exampleIndex = 0;
+    // this.examples = ["macintosh", "mate"];
+
+    this.importer = new FileImporter(this);
+
+    this.infoLayer = new InfoLayer();
+
+    this.canvas = canvas;
+    this.scene = new THREE.Scene();
+    this.renderer = new THREE.WebGLRenderer({
+      canvas: this.canvas,
+    });
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setClearColor(0x000000, 0);
+
+    this.splatViewer = new GaussianSplats3D.Viewer({
+      cameraUp: [0, 0, 1],
+      initialCameraPosition: [-1, -4, 6],
+      initialCameraLookAt: [0, 0, 0],
+      sharedMemoryForWorkers: false,
+      renderer: this.renderer,
+      enableOptionalEffects: true,
+    });
+    this.splatViewer
+      .addSplatScene("/examples/garten.ply", {
+        splatAlphaRemovalThreshold: 5,
+        showLoadingUI: true,
+        position: [0, 1, 0],
+        rotation: [0, 0, 0, 1],
+        scale: [1.5, 1.5, 1.5],
+        progressiveLoad: true,
+      })
+      .then(() => {
+        this.splatViewer.start();
+      });
+    console.log(this.splatViewer);
+    // this.importSplat("hi");
+  }
+
+  // --- CORE METHODS
+
+  update() {}
+
+  resize(width, height) {
+    // this.camera.aspect = width / height;
+    // this.camera.updateProjectionMatrix();
+    // this.renderer.setSize(width, height);
+  }
+
+  setViewMode(value) {
+    this.freeze = value;
+  }
+
+  loadNewExample() {
+    console.log("loading next example");
+    this.exampleIndex++;
+    if (this.exampleIndex >= this.examples.length) this.exampleIndex = 0;
+  }
+
+  setViewMode(value) {
+    console.log("set view mode");
+  }
+
+  setTransparencyMode(value) {
+    console.log("set transparency mode");
+    this.transparencyMode = value;
+    this.setWireframe(value);
+  }
+
+  // --- CUSTOM METHODS
+
+  setWireframe(value) {
+    this.splatViewer.splatMesh.material.wireframe = value;
+    this.splatViewer.splatMesh.material.blending = value
+      ? THREE.CustomBlending
+      : THREE.NormalBlending;
+
+    this.splatViewer.splatMesh.material.blendColor = new THREE.Color(0xa1edd0);
+    this.splatViewer.splatMesh.material.blendEquation = THREE.AddEquation; //default
+    this.splatViewer.splatMesh.material.blendSrc = THREE.OneMinusSrcColorFactor ; //default
+    this.splatViewer.splatMesh.material.blendDst = THREE.ConstantColorFactor; //default
+  }
+
+  // --- INPUTS
+
+  processSerialData() {
+    if (this.serialInput.connected) {
+      const input = this.serialInput.serialData;
+      console.log(input);
+    }
+  }
+
+  // --- FILE IMPORTS
+
+  importGlTF(url) {
+    this.gltfLoader.load(
+      url,
+      (gltf) => {
+        console.log("loaded gltf");
+      },
+      undefined,
+      function (error) {
+        console.log("could not load object");
+        console.error(error);
+        reject();
+      }
+    );
+  }
+
+  importImage(url) {
+    this.textureLoader.load(
+      url,
+      (texture) => {
+        console.log("loaded image");
+      },
+      undefined,
+      function (error) {
+        console.log("could not load texture");
+        console.error(error);
+        reject();
+      }
+    );
+  }
+
+  importSplat(url) {
+    // this.splatViewer.removeSplatScene(0);
+    console.log(url);
+    this.splatViewer.dispose().then(() => {
+      console.log("load");
+      this.splatViewer = new GaussianSplats3D.Viewer({
+        cameraUp: [0, 0, 1],
+        initialCameraPosition: [-1, -4, 6],
+        initialCameraLookAt: [0, 0, 0],
+        sharedMemoryForWorkers: false,
+        renderer: this.renderer,
+      });
+      this.splatViewer
+        .addSplatScene(url, {
+          splatAlphaRemovalThreshold: 5,
+          showLoadingUI: true,
+          position: [0, 1, 0],
+          rotation: [0, 0, 0, 1],
+          scale: [1.5, 1.5, 1.5],
+          progressiveLoad: true,
+        })
+        .then(() => {
+          this.splatViewer.start();
+        });
+    });
+  }
+}
