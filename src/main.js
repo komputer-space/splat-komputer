@@ -23,6 +23,7 @@ function setup() {
   app.transparencyLayer.addObject(app, "Application");
   app.transparencyLayer.addObject(app.transparencyLayer, "Transparency Layer");
   app.transparencyLayer.addObject(app.tool, "Tool");
+  app.transparencyLayer.addObject(app.tool.camera.position, "Camera");
 
   setTransparencyMode(true);
 

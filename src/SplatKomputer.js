@@ -10,7 +10,7 @@ export class SplatKomputer {
     this.freeze = false;
 
     this.exampleIndex = 0;
-    // this.examples = ["macintosh", "mate"];
+    this.examples = ["garten", "atelier", "baum", "turm", "zimmer"];
 
     this.importer = new FileImporter(this);
 
@@ -25,28 +25,35 @@ export class SplatKomputer {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setClearColor(0x000000, 0);
 
+    this.camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    this.camera.position.set(0, 20, 20);
+    this.camera.lookAt(0, 3, 0);
+
     this.splatViewer = new GaussianSplats3D.Viewer({
-      cameraUp: [0, 0, 1],
-      initialCameraPosition: [-1, -4, 6],
-      initialCameraLookAt: [0, 0, 0],
+      camera: this.camera,
       sharedMemoryForWorkers: false,
       renderer: this.renderer,
-      enableOptionalEffects: true,
     });
     this.splatViewer
       .addSplatScene("/examples/garten.ply", {
         splatAlphaRemovalThreshold: 5,
         showLoadingUI: true,
-        position: [0, 1, 0],
+        position: [0, 0, 0],
         rotation: [0, 0, 0, 1],
-        scale: [1.5, 1.5, 1.5],
         progressiveLoad: true,
       })
       .then(() => {
         this.splatViewer.start();
+        this.setupTransparencyView();
+        this.updateView();
       });
+
     console.log(this.splatViewer);
-    // this.importSplat("hi");
   }
 
   // --- CORE METHODS
@@ -67,6 +74,8 @@ export class SplatKomputer {
     console.log("loading next example");
     this.exampleIndex++;
     if (this.exampleIndex >= this.examples.length) this.exampleIndex = 0;
+    const fileName = this.examples[this.exampleIndex];
+    this.importSplat("/examples/" + fileName + ".ply");
   }
 
   setViewMode(value) {
@@ -76,21 +85,28 @@ export class SplatKomputer {
   setTransparencyMode(value) {
     console.log("set transparency mode");
     this.transparencyMode = value;
-    this.setWireframe(value);
+    this.setTransparencyView(value);
   }
 
   // --- CUSTOM METHODS
 
-  setWireframe(value) {
+  setTransparencyView(value) {
     this.splatViewer.splatMesh.material.wireframe = value;
     this.splatViewer.splatMesh.material.blending = value
       ? THREE.CustomBlending
       : THREE.NormalBlending;
+  }
 
-    this.splatViewer.splatMesh.material.blendColor = new THREE.Color(0xa1edd0);
+  setupTransparencyView() {
+    this.splatViewer.splatMesh.material.blendColor = new THREE.Color(0xdddddd);
     this.splatViewer.splatMesh.material.blendEquation = THREE.AddEquation; //default
-    this.splatViewer.splatMesh.material.blendSrc = THREE.OneMinusSrcColorFactor ; //default
+    this.splatViewer.splatMesh.material.blendSrc = THREE.OneMinusSrcColorFactor; //default
     this.splatViewer.splatMesh.material.blendDst = THREE.ConstantColorFactor; //default
+  }
+
+  updateView() {
+    this.setupTransparencyView();
+    this.setTransparencyView(this.transparencyMode);
   }
 
   // --- INPUTS
@@ -140,9 +156,8 @@ export class SplatKomputer {
     this.splatViewer.dispose().then(() => {
       console.log("load");
       this.splatViewer = new GaussianSplats3D.Viewer({
-        cameraUp: [0, 0, 1],
-        initialCameraPosition: [-1, -4, 6],
-        initialCameraLookAt: [0, 0, 0],
+        cameraUp: [0, 1, 0],
+        camera: this.camera,
         sharedMemoryForWorkers: false,
         renderer: this.renderer,
       });
@@ -150,13 +165,13 @@ export class SplatKomputer {
         .addSplatScene(url, {
           splatAlphaRemovalThreshold: 5,
           showLoadingUI: true,
-          position: [0, 1, 0],
+          position: [0, 0, 0],
           rotation: [0, 0, 0, 1],
-          scale: [1.5, 1.5, 1.5],
           progressiveLoad: true,
         })
         .then(() => {
           this.splatViewer.start();
+          this.updateView();
         });
     });
   }
