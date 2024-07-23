@@ -60,9 +60,6 @@ export class SplatKomputer {
   update() {}
 
   resize(width, height) {
-    // this.camera.aspect = width / height;
-    // this.camera.updateProjectionMatrix();
-    // this.renderer.setSize(width, height);
   }
 
   setViewMode(value) {
@@ -75,10 +72,6 @@ export class SplatKomputer {
     if (this.exampleIndex >= this.examples.length) this.exampleIndex = 0;
     const fileName = this.examples[this.exampleIndex];
     this.importSplat("/examples/" + fileName + ".ply");
-  }
-
-  setViewMode(value) {
-    console.log("set view mode");
   }
 
   setTransparencyMode(value) {
